@@ -3,16 +3,16 @@ import configparser
 import site_spider
 from scrapy.crawler import CrawlerProcess
 
-config = configparser.ConfigParser()
-config.read('scraper/spider.cfg')
+spider_conf = configparser.ConfigParser()
+spider_conf.read('scraper/spider.cfg')
 process = CrawlerProcess(settings={
     "FEEDS": {
         "scraper/items.json": {"format": "json"},
     },
 })
 
-for site in config.sections():
-    site_conf = config[site]
+for site in spider_conf.sections():
+    site_conf = spider_conf[site]
     process.crawl(
         site_spider.SiteSpider,
         name=site_conf['name'],
