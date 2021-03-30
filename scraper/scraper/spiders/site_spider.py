@@ -16,5 +16,6 @@ class SiteSpider(scrapy.Spider):
         for post in response.xpath(self.post_xpath):
             yield {
                 'title': post.xpath(self.title_xpath).get(),
-                'link': post.xpath(self.link_xpath).get()
+                'link': post.xpath(self.link_xpath).get(),
+                'site': self.name
             }

@@ -25,6 +25,9 @@ MANIFEST
 # Scrapy
 .scrapy
 
+# Scrapy Output
+scraper/out.json
+
 # Environments
 env/
 .env
