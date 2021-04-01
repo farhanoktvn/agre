@@ -11,13 +11,6 @@ spider_conf = configparser.ConfigParser()
 spider_conf.read('scraper/spider.cfg')
 
 settings = get_project_settings()
-settings.update({
-    'BOT_NAME': 'agrescraper',
-    'ROBOTSTXT_OBEY': True,
-    'ITEM_PIPELINES': {
-        'scraper.pipelines.JsonWriterPipeline': 100
-    }
-})
 runner = CrawlerRunner(settings)
 
 
@@ -34,7 +27,6 @@ def crawl():
             title_xpath=site_conf['title_xpath'],
             link_xpath=site_conf['link_xpath']
         )
-        # yield spider_obj
     reactor.stop()
 
 if __name__ == '__main__':
