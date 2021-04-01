@@ -11,6 +11,7 @@ class SiteSpider(scrapy.Spider):
         self.post_xpath = kwargs['post_xpath']
         self.title_xpath = kwargs['title_xpath']
         self.link_xpath = kwargs['link_xpath']
+        self.crawl_time = kwargs['crawl_time']
 
     def parse(self, response):
         for post in response.xpath(self.post_xpath):
