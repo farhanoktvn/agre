@@ -1,4 +1,5 @@
 import configparser
+import time
 from scraper.spiders import site_spider
 
 from twisted.internet import reactor, defer
@@ -25,9 +26,11 @@ def crawl():
             allowed_domain=site_conf['allowed_domain'],
             post_xpath=site_conf['post_xpath'],
             title_xpath=site_conf['title_xpath'],
-            link_xpath=site_conf['link_xpath']
+            link_xpath=site_conf['link_xpath'],
+            crawl_time=time.gmtime()
         )
     reactor.stop()
+
 
 if __name__ == '__main__':
     crawl()
