@@ -1,5 +1,6 @@
 import json
 import os
+import pymongo
 
 from itemadapter import ItemAdapter
 
@@ -43,18 +44,15 @@ class JsonWriterPipeline:
 
 class MongoPipeline:
 
-    collection_name = 'scrapy_items'
-
-    def __init__(self, mongo_uri, mongo_db):
-        self.mongo_uri = mongo_uri
-        self.mongo_db = mongo_db
+    def __init__(self, crawl_time):
+        self.mongo_uri = os.environ.get('MONGO_URI')
+        self.mongo_db = os.environ.get('MONGO_DB')
+        self.crawl_time = crawl_time
 
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(
-            mongo_uri=crawler.settings.get('MONGO_URI'),
-            mongo_db=crawler.settings.get('MONGO_DATABASE', 'items')
-        )
+        spider = crawler.spider
+        return cls(crawl_time=spider.crawl_time)
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(self.mongo_uri)
@@ -64,5 +62,10 @@ class MongoPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
-        self.db[self.collection_name].insert_one(ItemAdapter(item).asdict())
+        post = ItemAdapter(item).asdict()
+        post['crawl_time'] = self.crawl_time
+        if self.db[post.get('site')].find({'link': post['link']}).count() > 0:
+            pass
+        else:
+            self.db[post.get('site')].insert_one(post)
         return item
