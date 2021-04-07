@@ -44,19 +44,21 @@ class JsonWriterPipeline:
 
 class MongoPipeline:
 
-    def __init__(self, crawl_time):
+    def __init__(self, crawl_time, site):
         self.mongo_uri = os.environ.get('MONGO_URI')
         self.mongo_db = os.environ.get('MONGO_DB')
         self.crawl_time = crawl_time
+        self.site = site
 
     @classmethod
     def from_crawler(cls, crawler):
         spider = crawler.spider
-        return cls(crawl_time=spider.crawl_time)
+        return cls(crawl_time=spider.crawl_time, site=spider.name)
 
     def open_spider(self, spider):
         self.client = pymongo.MongoClient(self.mongo_uri)
         self.db = self.client[self.mongo_db]
+        self.db['site'].drop()
 
     def close_spider(self, spider):
         self.client.close()
@@ -64,8 +66,8 @@ class MongoPipeline:
     def process_item(self, item, spider):
         post = ItemAdapter(item).asdict()
         post['crawl_time'] = self.crawl_time
-        if self.db[post.get('site')].find({'link': post['link']}).count() > 0:
+        if self.db[self.site].find({'link': post['link']}).count() > 0:
             pass
         else:
-            self.db[post.get('site')].insert_one(post)
+            self.db[self.site].insert_one(post)
         return item
